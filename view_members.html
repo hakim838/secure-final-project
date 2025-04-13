@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Members - Gym manage</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="text-2xl font-bold mb-6 text-purple-700">Gym manage</div>
+        <a href="{{ url_for('register_member') }}" class="bg-purple-600 text-white py-2 px-4 rounded mb-4 w-full block text-center">Register member</a>
+        <nav class="space-y-2">
+            <a href="{{ url_for('dashboard') }}">Overview</a>
+            <a href="{{ url_for('view_members') }}">Members</a>
+            <a href="{{ url_for('view_classes') }}">Classes</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+        <h1 class="text-2xl font-bold mb-6">Member List</h1>
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead class="bg-gray-100 border-b border-gray-200">
+                <tr>
+                    <th class="text-left px-6 py-3">ID</th>
+                    <th class="text-left px-6 py-3">Name</th>
+                    <th class="text-left px-6 py-3">Status</th>
+                    <th class="text-left px-6 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">{{ member[0] }}</td>
+                    <td class="px-6 py-4">{{ member[1] }}</td>
+                    <td class="px-6 py-4 capitalize">{{ member[2] }}</td>
+                    <td class="px-6 py-4 space-x-2">
+                        <a href="{{ url_for('member_classes', member_id=member[0]) }}"
+                           class="text-blue-600 hover:underline">View Classes</a>
+                        <a href="{{ url_for('register_class', member_id=member[0]) }}"
+                           class="text-green-600 hover:underline">Register Class</a>
+                           <form method="POST" action="{{ url_for('delete_member', member_id=member[0]) }}" class="inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" onclick="return confirm('Are you sure?')" class="text-red-600 hover:underline">Delete</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</div>
+</body>
+</html>

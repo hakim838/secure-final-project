@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Member Classes - Gym manage</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="text-2xl font-bold mb-6 text-purple-700">Gym manage</div>
+        <a href="{{ url_for('register_member') }}" class="bg-purple-600 text-white py-2 px-4 rounded mb-4 w-full block text-center">Register member</a>
+        <nav class="space-y-2">
+            <a href="{{ url_for('dashboard') }}">Overview</a>
+            <a href="{{ url_for('view_members') }}">Members</a>
+            <a href="{{ url_for('view_classes') }}">Classes</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+        <h1 class="text-2xl font-bold mb-6">Classes for {{ member[1] }}</h1>
+
+        {% if classes %}
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead class="bg-gray-100 border-b border-gray-200">
+                <tr>
+                    <th class="text-left px-6 py-3">Class Name</th>
+                    <th class="text-left px-6 py-3">Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for class_item in classes %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">{{ class_item[0] }}</td>
+                    <td class="px-6 py-4">{{ class_item[1] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-gray-600">This member is not registered in any classes yet.</p>
+        {% endif %}
+    </main>
+</div>
+</body>
+</html>

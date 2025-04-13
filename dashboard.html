@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gym Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+     <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="text-2xl font-bold mb-6 text-purple-700">Gym manage</div>
+      <a href="{{ url_for('register_member') }}" class="bg-purple-600 text-white py-2 px-4 rounded mb-4 w-full block text-center">Register member</a>
+      <nav class="space-y-2">
+        <a href="{{ url_for('dashboard') }}">Overview</a>
+        <a href="{{ url_for('view_members') }}">Members</a>
+        <a href="{{ url_for('view_classes') }}">Classes</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="header">Welcome, {{ username }}</h1>
+      </div>
+
+      <!-- Top stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card">
+          <p class="stat-label">Total Members</p>
+          <p class="stat-value">{{ total_members }}</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Active Members</p>
+          <p class="stat-value">{{ active_members }}</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Total Classes</p>
+          <p class="stat-value">{{ total_classes }}</p>
+        </div>
+      </div>
+
+      <!-- Optional Chart Placeholder -->
+      <div class="text-center text-gray-500 text-sm">(Optional) Chart area here</div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Member - Gym manage</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="text-2xl font-bold mb-6 text-purple-700">Gym manage</div>
+        <a href="{{ url_for('register_member') }}" class="bg-purple-600 text-white py-2 px-4 rounded mb-4 w-full block text-center">Register member</a>
+        <nav class="space-y-2">
+            <a href="{{ url_for('dashboard') }}">Overview</a>
+            <a href="{{ url_for('view_members') }}">Members</a>
+            <a href="{{ url_for('view_classes') }}">Classes</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+        <h1 class="text-2xl font-bold mb-6">Register New Member</h1>
+
+        <form method="POST" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">        
+            <div>
+                <label class="block font-medium text-gray-700">Name</label>
+                <input type="text" name="name" required
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div>
+                <label class="block font-medium text-gray-700">Membership Status</label>
+                <select name="status" required
+                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <button type="submit"
+                    class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded">
+                Register Member
+            </button>
+        </form>
+    </main>
+</div>
+</body>
+</html>

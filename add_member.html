@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Member</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Add New Member</h2>
+
+    <form method="POST" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="name">Member Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label for="status">Membership Status:</label><br>
+        <select name="status" required>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select><br><br>
+
+        <button type="submit">Add Member</button>
+    </form>
+
+    <p><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></p>
+</body>
+</html>
