@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, request, redirect, url_for, session, g
+from flask import Flask, flash, render_template, request, redirect, url_for, session, g, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from flask_wtf import CSRFProtect
@@ -9,15 +9,22 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 app.config.update(
-    SESSION_COOKIE_HTTPONLY=True,     # Elak akses cookie melalui JavaScript
-    SESSION_COOKIE_SECURE=True,       # Hanya hantar cookie melalui HTTPS (guna bila dah deploy)
-    SESSION_COOKIE_SAMESITE='Lax'     # Cegah CSRF rentas laman (boleh juga guna 'Strict')
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=True,      # Enable only if running over HTTPS
+    SESSION_COOKIE_SAMESITE='Lax'
 )
-
 
 csrf = CSRFProtect(app)
 
 DATABASE = 'members.db'
+
+# Prevent browser from caching authenticated pages
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
 
 # Securely hashed user passwords
 USERS = {
@@ -78,6 +85,10 @@ def create_tables():
 # Login route
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    # Redirect logged-in users directly to dashboard
+    if 'user' in session:
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -88,7 +99,7 @@ def login():
             session['role'] = user['role']
             return redirect(url_for('dashboard'))
         else:
-            flash("Login failed. Invalid username or password.", 'danger')  # Menggunakan category 'danger' untuk alert
+            flash("Login failed. Invalid username or password.", 'danger')
             return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -100,13 +111,8 @@ def dashboard():
 
     db = get_db()
 
-    # Kira jumlah semua ahli
     total_members = query_db("SELECT COUNT(*) FROM members", one=True)[0]
-
-    # Kira ahli yang status 'active' (case-insensitive)
     active_members = query_db("SELECT COUNT(*) FROM members WHERE LOWER(membership_status) = 'active'", one=True)[0]
-
-    # Kira jumlah kelas
     total_classes = query_db("SELECT COUNT(*) FROM classes", one=True)[0]
 
     return render_template('dashboard.html',
@@ -115,8 +121,6 @@ def dashboard():
                            active_members=active_members,
                            total_classes=total_classes)
 
-
-# Add member
 @app.route('/add_member', methods=['GET', 'POST'])
 @staff_required
 def add_member():
@@ -133,7 +137,6 @@ def add_member():
     
     return render_template('add_member.html')
 
-# View specific member's classes
 @app.route('/member/<int:member_id>/classes')
 def member_classes(member_id):
     if 'user' not in session:
@@ -146,7 +149,6 @@ def member_classes(member_id):
     
     return render_template('member_classes.html', member=member, classes=classes)
 
-# Register a member to a class
 @app.route('/register_class/<int:member_id>', methods=['GET', 'POST'])
 @staff_required
 def register_class(member_id):
@@ -161,14 +163,12 @@ def register_class(member_id):
 
     return render_template('register_class.html', member_id=member_id, classes=classes)
 
-# View all members
 @app.route('/view_members')
 @staff_required
 def view_members():
     members = query_db("SELECT * FROM members")
     return render_template('view_members.html', members=members)
 
-# Register a new member
 @app.route('/register_member', methods=['GET', 'POST'])
 @staff_required
 def register_member():
@@ -185,7 +185,6 @@ def register_member():
 
     return render_template('register_member.html')
 
-# Add new class
 @app.route('/add_class', methods=['GET', 'POST'])
 @staff_required
 def add_class():
@@ -202,7 +201,6 @@ def add_class():
 
     return render_template('add_class.html')
 
-# View all classes
 @app.route('/view_classes')
 def view_classes():
     if 'user' not in session:
@@ -211,7 +209,6 @@ def view_classes():
     classes = query_db("SELECT * FROM classes")
     return render_template('view_classes.html', classes=classes)
 
-# Delete a member
 @app.route('/delete_member/<int:member_id>', methods=['POST'])
 @staff_required
 def delete_member(member_id):
@@ -221,7 +218,6 @@ def delete_member(member_id):
     db.commit()
     return redirect(url_for('view_members'))
 
-# Logout
 @app.route('/logout')
 def logout():
     session.pop('user', None)
